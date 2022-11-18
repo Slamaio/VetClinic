@@ -50,11 +50,10 @@ public class Clinic : IClinic
     public List<IAnimal> GetUpcoming(int days = 7) =>
         Animals
             .Where(a => a.ScheduledProcedures
-                .Any(p => (DateTime.Now - p.PlannedDate).Days <= days))
+                .Any(p => (DateTime.Now - p.Value).Days <= days))
             .ToList();
 
-    
-    
+
     public void RecordVisit(IAnimal animal, DateTime date)
     {
         AnimalInfos[animal].AddVisit(date);
@@ -67,17 +66,11 @@ public class Clinic : IClinic
 
     public void ScheduleProcedure(IAnimal animal, DateTime date, string name)
     {
-        animal.ScheduledProcedures.Add(new Procedure
-        {
-            Clinic = this,
-            Name = name,
-            PlannedDate = date
-        });
+        animal.ScheduleProcedure(name, date);
     }
 
-    public void PerformProcedure(IAnimal animal, Procedure procedure)
+    public void PerformProcedure(IAnimal animal, string name)
     {
-        // animal.
-        throw new NotImplementedException();
+        animal.PerformProcedure(name);
     }
 }

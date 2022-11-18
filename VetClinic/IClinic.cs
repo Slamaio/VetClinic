@@ -25,5 +25,5 @@ public interface IClinic
     public void RecordDischarge(IAnimal animal, DateTime date);
 
     public void ScheduleProcedure(IAnimal animal, DateTime date, string name);
-    public void PerformProcedure(IAnimal animal, Procedure procedure);
+    public void PerformProcedure(IAnimal animal, string name);
 }

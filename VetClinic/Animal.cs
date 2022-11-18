@@ -3,7 +3,7 @@ namespace VetClinic;
 public class Animal : IAnimal
 {
     private IClient? _owner;
-    private List<Procedure> _procedures = new();
+    private readonly Dictionary<string, DateTime> _procedures = new();
 
     public Animal(string name, string type, IClient? owner = null)
     {
@@ -26,11 +26,21 @@ public class Animal : IAnimal
         }
     }
 
-    public List<Procedure> PerformedProcedures =>
-        _procedures.Where(p => p.PerformedDate != null).ToList();
+    public IReadOnlyDictionary<string, DateTime> PerformedProcedures =>
+        (IReadOnlyDictionary<string, DateTime>)_procedures.Where(p => p.Value < DateTime.Now);
 
-    public List<Procedure> ScheduledProcedures =>
-        _procedures.Where(p => p.PerformedDate == null).ToList();
+    public IReadOnlyDictionary<string, DateTime> ScheduledProcedures =>
+        (IReadOnlyDictionary<string, DateTime>)_procedures.Where(p => p.Value >= DateTime.Now);
+
+    public void ScheduleProcedure(string name, DateTime date)
+    {
+        _procedures[name] = date;
+    }
+
+    public void PerformProcedure(string name)
+    {
+        _procedures[name] = DateTime.Now;
+    }
 
     public bool HasOwner() => Owner != null;
 }

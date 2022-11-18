@@ -5,10 +5,11 @@ public interface IAnimal
     public string Name { get; set; }
     public string Type { get; }
     public IClient? Owner { get; set; }
-    public List<Procedure> PerformedProcedures { get; }
-    public List<Procedure> ScheduledProcedures { get; }
+    public IReadOnlyDictionary<string, DateTime> PerformedProcedures { get; }
+    public IReadOnlyDictionary<string, DateTime> ScheduledProcedures { get; }
 
-    // TODO: schedule and perform
+    public void ScheduleProcedure(string name, DateTime date);
+    public void PerformProcedure(string name);
     
     public bool HasOwner();
 }
