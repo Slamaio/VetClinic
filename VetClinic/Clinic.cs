@@ -38,7 +38,7 @@ public class Clinic : IClinic
             AnimalInfos.Remove(animal);
     }
 
-    public Dictionary<DateTime, DateTime?> VisitHistory(IAnimal animal, TimeSpan? timeSpan = null)
+    public IReadOnlyDictionary<DateTime, DateTime?> VisitHistory(IAnimal animal, TimeSpan? timeSpan = null)
     {
         if (timeSpan == null)
             return AnimalInfos[animal].VisitRecord;

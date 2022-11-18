@@ -1,14 +1,12 @@
 namespace VetClinic;
 
-public record AnimalInfo(IAnimal Animal)
+public record AnimalInfo(IAnimal Animal) : IAnimalInfo
 {
     private DateTime? _lastVisit;
 
-    public readonly IAnimal Animal = Animal;
-    public readonly Dictionary<DateTime, DateTime?> VisitRecord = new();
+    public IAnimal Animal { get; } = Animal;
+    public Dictionary<DateTime, DateTime?> VisitRecord { get; } = new();
 
-    // TODO: combine into a single add method 
-    
     public void AddVisit(DateTime date)
     {
         if (_lastVisit != null && VisitRecord[(DateTime)_lastVisit] == null)
