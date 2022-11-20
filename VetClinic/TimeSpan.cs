@@ -2,8 +2,9 @@ namespace VetClinic;
 
 public enum TimeSpan
 {
-    Day = 1,
-    Week = 7,
-    Month = 30,
-    Year = 365
+    Day,
+    Week,
+    Month,
+    Year,
+    All
 }

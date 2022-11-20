@@ -1,7 +1,13 @@
 namespace VetClinic;
 
+[Serializable]
 public class Clinic : IClinic
 {
+    public Clinic()
+    {
+        Name = "Vet Clinic";
+    }
+    
     public Clinic(string name)
     {
         Name = name;
@@ -9,7 +15,7 @@ public class Clinic : IClinic
 
     public string Name { get; set; }
 
-    public Dictionary<IAnimal, AnimalInfo> AnimalInfos { get; } = new();
+    public Dictionary<IAnimal, AnimalInfo> AnimalInfos { get; protected set; } = new();
     public List<IAnimal> Animals => AnimalInfos.Keys.ToList();
 
     public List<IClient> Clients =>
@@ -22,29 +28,38 @@ public class Clinic : IClinic
     public List<IAnimal> Find(List<IAnimal> source, Predicate<IAnimal> predicate) => source.FindAll(predicate);
     public List<IClient> Find(List<IClient> source, Predicate<IClient> predicate) => source.FindAll(predicate);
 
-    public void Add(IAnimal animal)
+    public void AddAnimal(IAnimal animal)
     {
         AnimalInfos.Add(animal, new AnimalInfo(animal));
     }
 
-    public void Delete(IAnimal animal)
+    public void DeleteAnimal(IAnimal animal)
     {
         AnimalInfos.Remove(animal);
     }
 
-    public void Delete(IClient client)
+    public void DeleteClient(IClient client)
     {
         foreach (var animal in client.Pets)
             AnimalInfos.Remove(animal);
     }
 
-    public IReadOnlyDictionary<DateTime, DateTime?> VisitHistory(IAnimal animal, TimeSpan? timeSpan = null)
-    {
-        if (timeSpan == null)
-            return AnimalInfos[animal].VisitRecord;
+    public IReadOnlyDictionary<DateTime, DateTime?> VisitHistory(IAnimal animal, TimeSpan timeSpan = TimeSpan.All) =>
+        AnimalInfos[animal].VisitRecord
+            .Where(p => CheckTimeSpan(p.Key, timeSpan))
+            .ToDictionary(p => p.Key, p => p.Value);
 
-        return (Dictionary<DateTime, DateTime?>)AnimalInfos[animal].VisitRecord
-            .Where(v => (DateTime.Now - v.Key).Days < (int)timeSpan);
+    private static bool CheckTimeSpan(DateTime date, TimeSpan span)
+    {
+        return span switch
+        {
+            TimeSpan.Day => DateTime.Now.AddDays(-1) <= date,
+            TimeSpan.Week => DateTime.Now.AddDays(-7) <= date,
+            TimeSpan.Month => DateTime.Now.AddMonths(-1) <= date,
+            TimeSpan.Year => DateTime.Now.AddYears(-1) <= date,
+            TimeSpan.All => true,
+            _ => false
+        };
     }
 
     public List<IAnimal> GetUpcoming(int days = 7) =>
@@ -54,23 +69,23 @@ public class Clinic : IClinic
             .ToList();
 
 
-    public void RecordVisit(IAnimal animal, DateTime date)
+    public void AddVisit(IAnimal animal, DateTime date)
     {
-        AnimalInfos[animal].AddVisit(date);
+        AnimalInfos[animal].AddRecord(date);
     }
 
-    public void RecordDischarge(IAnimal animal, DateTime date)
+    public void AddDischarge(IAnimal animal, DateTime date)
     {
-        AnimalInfos[animal].AddDischarge(date);
+        AnimalInfos[animal].AddRecord(date);
     }
 
-    public void ScheduleProcedure(IAnimal animal, DateTime date, string name)
+    public void ScheduleProcedure(IAnimal animal, string name, DateTime date)
     {
         animal.ScheduleProcedure(name, date);
     }
 
-    public void PerformProcedure(IAnimal animal, string name)
+    public void PerformProcedure(IAnimal animal, string name, DateTime date)
     {
-        animal.PerformProcedure(name);
+        animal.PerformProcedure(name, date);
     }
 }

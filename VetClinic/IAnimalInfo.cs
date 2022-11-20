@@ -6,14 +6,8 @@ public interface IAnimalInfo
     public Dictionary<DateTime, DateTime?> VisitRecord { get; }
     
     /// <summary>
-    /// 
+    /// Record when an animal visited or was discharged from a clinic.
     /// </summary>
-    /// <param name="date"></param>
-    public void AddVisit(DateTime date);
-
-    /// <summary>
-    /// 
-    /// </summary>
-    /// <param name="date"></param>
-    public void AddDischarge(DateTime date);
+    /// <param name="date">A date of the visit/discharge.</param>
+    public void AddRecord(DateTime date);
 }

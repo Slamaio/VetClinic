@@ -16,14 +16,26 @@
     10.Додати основні функції (додання, пошук, оновлення, видалення) для клієнта, а також перегляд тварин певного клієнта (5)
 */
 
-var x = new Clinic("Vet Clinic");
-var bob = new Client("bob");
-var josh = new Client("josh");
-var dog = new Animal("test", "dog");
-var cat = new Animal("test2", "cat", josh);
-x.Add(dog);
-x.Add(cat);
+// var clinic = new ConsoleClinic("VetClinic");
+// var bob = new Client("Bob");
+// var josh = new Client("Josh");
+// var dog = new Animal("Beethoven", "dog", bob);
+// var cat = new Animal("Bern", "cat", josh);
+// clinic.AddAnimal(dog);
+// clinic.AddAnimal(cat);
+//
+// var path = "/home/slamaio/repos/DotnetProjects/VetClinic/VetClinic/";
+// var filename = $"{clinic.Name}_{clinic.GetType()}_{DateTime.Now.Ticks}.clinic.backup";
+// var filePath = ClinicBackup.Export(clinic, path+filename);
+//
+// var consoleClinic = ClinicBackup.Import(filePath) as ConsoleClinic;
 
-dog.Owner = josh;
+var consoleClinic = new ConsoleClinic("VetClinic");
+var bob = new Client("Bob");
+var josh = new Client("Josh");
+var dog = new Animal("Beethoven", "dog", bob);
+var cat = new Animal("Bern", "cat", josh);
+consoleClinic.AddAnimal(dog);
+consoleClinic.AddAnimal(cat);
 
-Console.WriteLine("Hello, World!");
+consoleClinic.MainLoop();

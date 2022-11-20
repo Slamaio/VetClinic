@@ -1,5 +1,6 @@
 namespace VetClinic;
 
+[Serializable]
 public record AnimalInfo(IAnimal Animal) : IAnimalInfo
 {
     private DateTime? _lastVisit;
@@ -7,24 +8,17 @@ public record AnimalInfo(IAnimal Animal) : IAnimalInfo
     public IAnimal Animal { get; } = Animal;
     public Dictionary<DateTime, DateTime?> VisitRecord { get; } = new();
 
-    public void AddVisit(DateTime date)
+    public void AddRecord(DateTime date)
     {
-        if (_lastVisit != null && VisitRecord[(DateTime)_lastVisit] == null)
-            throw new Exception("Try AddDischarge() instead.");
-
-        VisitRecord[date] = null;
-        _lastVisit = date;
-    }
-
-    public void AddDischarge(DateTime date)
-    {
-        if (_lastVisit == null)
-            throw new Exception("Try AddVisit() instead.");
-        if (_lastVisit >= date)
-            throw new Exception("Try AddVisit() instead.");
-        if (VisitRecord[(DateTime)_lastVisit] != null)
-            throw new Exception("Try AddVisit() instead.");
-
-        VisitRecord[(DateTime)_lastVisit] = date;
+        if (date < _lastVisit)
+            throw new ArgumentException("Can't travel back in time.");
+        
+        if (_lastVisit == null || VisitRecord[(DateTime)_lastVisit] != null)
+        {
+            VisitRecord[date] = null;
+            _lastVisit = date;
+        }
+        else
+            VisitRecord[(DateTime)_lastVisit] = date;
     }
 }

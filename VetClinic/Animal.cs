@@ -1,5 +1,6 @@
 namespace VetClinic;
 
+[Serializable]
 public class Animal : IAnimal
 {
     private IClient? _owner;
@@ -37,9 +38,9 @@ public class Animal : IAnimal
         _procedures[name] = date;
     }
 
-    public void PerformProcedure(string name)
+    public void PerformProcedure(string name, DateTime date)
     {
-        _procedures[name] = DateTime.Now;
+        _procedures[name] = date;
     }
 
     public bool HasOwner() => Owner != null;

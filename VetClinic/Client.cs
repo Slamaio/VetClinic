@@ -1,5 +1,6 @@
 namespace VetClinic;
 
+[Serializable]
 public class Client : IClient
 {
     public Client(string name)
