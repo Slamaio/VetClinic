@@ -1,4 +1,6 @@
-namespace VetClinic;
+using VetClinic.Interfaces;
+
+namespace VetClinic.Modules;
 
 [Serializable]
 public class Animal : IAnimal

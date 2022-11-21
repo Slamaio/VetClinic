@@ -1,4 +1,4 @@
-namespace VetClinic;
+namespace VetClinic.Modules;
 
 public enum TimeSpan
 {

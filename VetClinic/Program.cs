@@ -1,4 +1,5 @@
 ﻿using VetClinic;
+using VetClinic.Modules;
 
 /*
 Програма для ведення обліку відвідувачів ветеринарної клініки

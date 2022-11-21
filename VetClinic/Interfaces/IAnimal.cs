@@ -1,4 +1,4 @@
-namespace VetClinic;
+namespace VetClinic.Interfaces;
 
 public interface IAnimal
 {

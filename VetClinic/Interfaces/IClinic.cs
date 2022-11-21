@@ -1,4 +1,7 @@
-namespace VetClinic;
+using VetClinic.Modules;
+using TimeSpan = VetClinic.Modules.TimeSpan;
+
+namespace VetClinic.Interfaces;
 
 public interface IClinic
 {

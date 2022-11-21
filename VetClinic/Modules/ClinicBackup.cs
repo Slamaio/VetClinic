@@ -1,6 +1,6 @@
-using System.Xml.Serialization;
+using VetClinic.Interfaces;
 
-namespace VetClinic;
+namespace VetClinic.Modules;
 
 public static class ClinicBackup
 {
