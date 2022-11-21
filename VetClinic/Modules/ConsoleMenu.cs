@@ -2,6 +2,7 @@ using VetClinic.Interfaces;
 
 namespace VetClinic.Modules;
 
+[Serializable]
 public class ConsoleMenu : List<IMenuItem>, IConsoleMenu
 {
     public ConsoleMenu(string title, string separator, IConsoleMenu? parentMenu = null, bool softExit = false,

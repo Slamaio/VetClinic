@@ -5,6 +5,7 @@ namespace VetClinic.Modules;
 [Serializable]
 public class ConsoleClinic : Clinic
 {
+    [NonSerialized]
     private Dictionary<string, ConsoleMenu> _menus = new();
 
     public ConsoleClinic(string name) : base(name)
@@ -150,12 +151,14 @@ public class ConsoleClinic : Clinic
         {
             Console.Clear();
             Console.Write("Days: ");
-            var days = Console.Read();
+            var days = int.Parse(Console.ReadLine());
             foreach (var animal in GetUpcoming(days))
             {
                 Console.WriteLine(
                     $"{animal.Name} ({animal.Type}) - {(animal.HasOwner() ? $"{animal.Owner?.Name}" : "No owner")}");
-                var procedures = animal.ScheduledProcedures.Where(p => (DateTime.Now - p.Value).Days <= days);
+                var procedures = animal.ScheduledProcedures
+                    .Where(p => (DateTime.Now - p.Value).Days <= days)
+                    .ToDictionary(p => p.Key, p => p.Value);;
                 foreach (var (name, time) in procedures)
                     Console.WriteLine($"\t{name} - {time}");
             }
@@ -163,12 +166,44 @@ public class ConsoleClinic : Clinic
 
         void Schedule()
         {
-            throw new NotImplementedException();
+            Console.Clear();
+            var animal = GetAnimal();
+            if (animal == null)
+            {
+                Console.WriteLine("Animal is not present in the database.");
+                return;
+            }
+            Console.Clear();
+            Console.Write("Procedure name: ");
+            var name = Console.ReadLine();
+            
+            Console.Write("Procedure planned date (mm/dd/yyyy hh:mm): ");
+            var date = Console.ReadLine() + ":00";
+            
+            ScheduleProcedure(animal, name, DateTime.Parse(date));
+            
+            Console.WriteLine("Successfully scheduled.");
         }
 
         void Perform()
         {
-            throw new NotImplementedException();
+            Console.Clear();
+            var animal = GetAnimal();
+            if (animal == null)
+            {
+                Console.WriteLine("Animal is not present in the database.");
+                return;
+            }
+            Console.Clear();
+            Console.Write("Procedure name: ");
+            var name = Console.ReadLine();
+            
+            Console.Write("Procedure planned date (mm/dd/yyyy hh:mm): ");
+            var date = Console.ReadLine() + ":00";
+            
+            PerformProcedure(animal, name, DateTime.Parse(date));
+            
+            Console.WriteLine("Successfully performed.");
         }
     }
 

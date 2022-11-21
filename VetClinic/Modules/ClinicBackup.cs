@@ -24,7 +24,7 @@ public static class ClinicBackup
     /// <returns></returns>
     public static string Export(IClinic clinic, string? path = null)
     {
-        path += $"/{clinic.Name}_{clinic.GetType()}_{DateTime.Now.Ticks}.clinic.backup";
+        path += $"{clinic.Name}_{clinic.GetType()}_{DateTime.Now.Ticks}.clinic.backup";
         foreach (char c in Path.GetInvalidPathChars())
             path = path.Replace(c, '_');
         path = path.Replace(' ', '-');

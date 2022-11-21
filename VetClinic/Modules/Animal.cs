@@ -30,10 +30,14 @@ public class Animal : IAnimal
     }
 
     public IReadOnlyDictionary<string, DateTime> PerformedProcedures =>
-        (IReadOnlyDictionary<string, DateTime>)_procedures.Where(p => p.Value < DateTime.Now);
+        _procedures
+            .Where(p => p.Value < DateTime.Now)
+            .ToDictionary(p => p.Key, p => p.Value);
 
     public IReadOnlyDictionary<string, DateTime> ScheduledProcedures =>
-        (IReadOnlyDictionary<string, DateTime>)_procedures.Where(p => p.Value >= DateTime.Now);
+        _procedures
+            .Where(p => p.Value >= DateTime.Now)
+            .ToDictionary(p => p.Key, p => p.Value);
 
     public void ScheduleProcedure(string name, DateTime date)
     {

@@ -2,6 +2,7 @@ using VetClinic.Interfaces;
 
 namespace VetClinic.Modules;
 
+[Serializable]
 public class ConsoleMenuItem : IMenuItem
 {
     public static ConsoleMenuItem Exit => new("Exit", () => Environment.Exit(0));

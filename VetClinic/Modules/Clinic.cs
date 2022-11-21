@@ -67,7 +67,7 @@ public class Clinic : IClinic
     public List<IAnimal> GetUpcoming(int days = 7) =>
         Animals
             .Where(a => a.ScheduledProcedures
-                .Any(p => (DateTime.Now - p.Value).Days <= days))
+                .Any(p => p.Value.AddDays(-days) <= DateTime.Now))
             .ToList();
 
 
