@@ -3,14 +3,15 @@ using VetClinic.Interfaces;
 namespace VetClinic.Modules;
 
 [Serializable]
-public class ConsoleClinic : Clinic
+public class ConsoleClinic
 {
-    [NonSerialized]
-    private Dictionary<string, ConsoleMenu> _menus = new();
+    private IClinic _clinic;
+    [NonSerialized] private Dictionary<string, ConsoleMenu> _menus = new();
 
-    public ConsoleClinic(string name) : base(name)
+    public ConsoleClinic(IClinic clinic)
     {
-        _menus["Main"] = new ConsoleMenu($"{Name} Main Menu", ": ");
+        _clinic = clinic;
+        _menus["Main"] = new ConsoleMenu($"{_clinic.Name} Main Menu", ": ");
         _menus["Animals"] = new ConsoleMenu("Animals", ": ", _menus["Main"], true);
         _menus["VisitRecords"] = new ConsoleMenu("Visit records", ": ", _menus["Main"], true);
         _menus["VisitsHistory"] = new ConsoleMenu("Time span", ": ", _menus["VisitRecords"], true);
@@ -19,7 +20,7 @@ public class ConsoleClinic : Clinic
 
         PopulateMenus();
     }
-    
+
     // ------------------------------------------------------------------------------------------------------
     // Populate menus...
     //
@@ -51,7 +52,7 @@ public class ConsoleClinic : Clinic
         void ShowList()
         {
             Console.Clear();
-            foreach (var animal in Animals)
+            foreach (var animal in _clinic.Animals)
                 Console.WriteLine(
                     $"{animal.Name} ({animal.Type}) - {(animal.HasOwner() ? $"{animal.Owner?.Name}" : "No owner")}");
         }
@@ -66,10 +67,10 @@ public class ConsoleClinic : Clinic
 
             Client? client = null;
             if (owner != null)
-                client = (Client?)(Clients.Find(c => c.Name == owner) ?? new Client(owner));
+                client = (Client?)(_clinic.Clients.Find(c => c.Name == owner) ?? new Client(owner));
             var animal = new Animal(name, type, client);
 
-            AddAnimal(animal);
+            _clinic.AddAnimal(animal);
             Console.WriteLine("Successfully added.");
         }
 
@@ -79,7 +80,7 @@ public class ConsoleClinic : Clinic
             var animal = GetAnimal();
             if (animal != null)
             {
-                DeleteAnimal(animal);
+                _clinic.DeleteAnimal(animal);
                 Console.WriteLine("Successfully removed.");
             }
             else Console.WriteLine("Animal is not present in the database.");
@@ -91,14 +92,14 @@ public class ConsoleClinic : Clinic
         _menus["VisitRecords"].Add(new ConsoleMenuItem("Record a visit", Visit));
         _menus["VisitRecords"].Add(new ConsoleMenuItem("Record a discharge", Discharge));
         _menus["VisitRecords"].Add(new ConsoleMenuItem("Visits history", _menus["VisitsHistory"].Menu));
-        
+
         void Visit()
         {
             Console.Clear();
             var animal = GetAnimal();
             if (animal != null)
             {
-                AddVisit(animal, DateTime.Now);
+                _clinic.AddVisit(animal, DateTime.Now);
                 Console.WriteLine("Visit recorded.");
             }
             else Console.WriteLine("Animal is not present in the database.");
@@ -110,13 +111,13 @@ public class ConsoleClinic : Clinic
             var animal = GetAnimal();
             if (animal != null)
             {
-                AddDischarge(animal, DateTime.Now);
+                _clinic.AddDischarge(animal, DateTime.Now);
                 Console.WriteLine("Discharge recorded.");
             }
             else Console.WriteLine("Animal is not present in the database.");
         }
     }
-    
+
     private void PopulateVisitsHistoryMenu()
     {
         _menus["VisitsHistory"].Add(new ConsoleMenuItem("Day", () => ShowHistory(TimeSpan.Day)));
@@ -136,7 +137,7 @@ public class ConsoleClinic : Clinic
                 return;
             }
 
-            foreach (var (visit, discharge) in VisitHistory(animal, span))
+            foreach (var (visit, discharge) in _clinic.VisitHistory(animal, span))
                 Console.WriteLine($"{visit} - {discharge}");
         }
     }
@@ -146,19 +147,20 @@ public class ConsoleClinic : Clinic
         _menus["Procedures"].Add(new ConsoleMenuItem("Show Upcoming", ShowUpcoming));
         _menus["Procedures"].Add(new ConsoleMenuItem("Schedule a procedure", Schedule));
         _menus["Procedures"].Add(new ConsoleMenuItem("Mark as performed", Perform));
-            
+
         void ShowUpcoming()
         {
             Console.Clear();
             Console.Write("Days: ");
             var days = int.Parse(Console.ReadLine());
-            foreach (var animal in GetUpcoming(days))
+            foreach (var animal in _clinic.GetUpcoming(days))
             {
                 Console.WriteLine(
                     $"{animal.Name} ({animal.Type}) - {(animal.HasOwner() ? $"{animal.Owner?.Name}" : "No owner")}");
                 var procedures = animal.ScheduledProcedures
                     .Where(p => (DateTime.Now - p.Value).Days <= days)
-                    .ToDictionary(p => p.Key, p => p.Value);;
+                    .ToDictionary(p => p.Key, p => p.Value);
+                ;
                 foreach (var (name, time) in procedures)
                     Console.WriteLine($"\t{name} - {time}");
             }
@@ -173,15 +175,16 @@ public class ConsoleClinic : Clinic
                 Console.WriteLine("Animal is not present in the database.");
                 return;
             }
+
             Console.Clear();
             Console.Write("Procedure name: ");
             var name = Console.ReadLine();
-            
+
             Console.Write("Procedure planned date (mm/dd/yyyy hh:mm): ");
             var date = Console.ReadLine() + ":00";
-            
-            ScheduleProcedure(animal, name, DateTime.Parse(date));
-            
+
+            _clinic.ScheduleProcedure(animal, name, DateTime.Parse(date));
+
             Console.WriteLine("Successfully scheduled.");
         }
 
@@ -194,15 +197,16 @@ public class ConsoleClinic : Clinic
                 Console.WriteLine("Animal is not present in the database.");
                 return;
             }
+
             Console.Clear();
             Console.Write("Procedure name: ");
             var name = Console.ReadLine();
-            
+
             Console.Write("Procedure planned date (mm/dd/yyyy hh:mm): ");
             var date = Console.ReadLine() + ":00";
-            
-            PerformProcedure(animal, name, DateTime.Parse(date));
-            
+
+            _clinic.PerformProcedure(animal, name, DateTime.Parse(date));
+
             Console.WriteLine("Successfully performed.");
         }
     }
@@ -221,9 +225,9 @@ public class ConsoleClinic : Clinic
 
             try
             {
-                var temp = ClinicBackup.Import(path ?? throw new InvalidOperationException());
-                Name = temp.Name;
-                AnimalInfos = temp.AnimalInfos;
+                _clinic = ClinicBackup.Import(path ?? throw new InvalidOperationException());
+                // _clinic.Name = temp.Name;
+                // AnimalInfos = temp.AnimalInfos;
                 Console.WriteLine("Backup loaded.");
             }
             catch (Exception e)
@@ -240,7 +244,14 @@ public class ConsoleClinic : Clinic
             var path = Console.ReadLine();
             if (string.IsNullOrWhiteSpace(path))
                 path = null;
-            ClinicBackup.Export(this, path);
+            try
+            {
+                ClinicBackup.Export(_clinic, path);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("Backup failed.");
+            }
 
             Console.WriteLine("Backup saved.");
         }
@@ -274,8 +285,8 @@ public class ConsoleClinic : Clinic
         var owner = GetAnimalOwner();
 
         var animal = owner == null
-            ? Animals.Find(a => a.Name == name && a.Type == type && !a.HasOwner())
-            : Animals.Find(a => a.Name == name && a.Type == type && a.Owner?.Name == owner);
+            ? _clinic.Animals.Find(a => a.Name == name && a.Type == type && !a.HasOwner())
+            : _clinic.Animals.Find(a => a.Name == name && a.Type == type && a.Owner?.Name == owner);
         return animal;
     }
 
@@ -283,7 +294,7 @@ public class ConsoleClinic : Clinic
     private void MenuClients()
     {
         Console.Clear();
-        foreach (var client in Clients)
+        foreach (var client in _clinic.Clients)
             Console.WriteLine(client.Name);
     }
 
